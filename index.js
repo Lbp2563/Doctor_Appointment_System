@@ -372,7 +372,7 @@ app.delete('/deleteUser', async (req, res) => {
 
 
 
-        const del_bookapp = await BookedAppointment.findOne({
+        const del_bookapp = await BookedAppointment.find({
             $or: [
               { D_name: username },
               { P_name: username }
@@ -397,10 +397,28 @@ app.delete('/deleteUser', async (req, res) => {
 
 
 
-        let d_name_value;
+//         let d_name_value=[];
 
-if (del_bookapp && del_bookapp.P_name === username) {
-  d_name_value = del_bookapp.D_name;
+// if (del_bookapp ) {
+
+// for(var i=0;i<del_bookapp.size();i++)
+//     {
+//         if(del_bookapp[i].P_name === username)
+//             {              
+//              d_name_value[i]= del_bookapp[i].D_name;
+//             }
+//    }
+ 
+// }
+
+let d_name_value = [];
+
+if (del_bookapp) { // Assuming 'del_bookapps' is the correct variable name
+  for (const appointment of del_bookapp) {
+    if (appointment.P_name === username) {
+      d_name_value.push(appointment.D_name);
+    }
+  }
 }
 
 
@@ -453,30 +471,55 @@ if (del_bookapp && del_bookapp.P_name === username) {
 });
 
 
-           async  function change_is_approved(D_name)
+           async  function change_is_approved(d_name_value)
             {
-                  
-                    console.log(D_name);
 
+                for (let i = 0; i < d_name_value.length; i++) {
+                    console.log(d_name_value[i]);
 
                     try {
 
                    
-                           // Update user settings in the collection
-                           const result = await Appointment.updateOne(
-                               { loggedInUser: D_name},
-                               {
-                                   $set: {
-                                    isApproved:false,
-                                   },
-                               }
-                           );
-                             //  console.log(result);
+                        // Update user settings in the collection
+                        const result = await Appointment.updateOne(
+                            { loggedInUser: d_name_value[i]},
+                            {
+                                $set: {
+                                 isApproved:false,
+                                },
+                            }
+                        );
+                          //  console.log(result);
+                
+                      
+                    } catch (error) {
+                        console.error(error);
+                    }
+
+                  }
+                  
+                  
+//                    console.log(D_name);
+
+
+                    // try {
+
+                   
+                    //        // Update user settings in the collection
+                    //        const result = await Appointment.updateOne(
+                    //            { loggedInUser: d_name_value[0]},
+                    //            {
+                    //                $set: {
+                    //                 isApproved:false,
+                    //                },
+                    //            }
+                    //        );
+                    //          //  console.log(result);
                    
                          
-                       } catch (error) {
-                           console.error(error);
-                       }
+                    //    } catch (error) {
+                    //        console.error(error);
+                    //    }
 
 
 

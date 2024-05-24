@@ -124,19 +124,22 @@ router.post('/login', async (req, res) => {
 
 
 
-     const del_bookapp = await BookedAppointment.findOne({
+     const del_bookapp = await BookedAppointment.find({
       $or: [
         { D_name: username },
         { P_name: username }
       ]
     });
 
-     
-     let d_name_value;
+    let d_name_value = [];
 
-     if (del_bookapp && del_bookapp.P_name === username) {
-       d_name_value = del_bookapp.D_name;
-     }
+    if (del_bookapp) { // Assuming 'del_bookapps' is the correct variable name
+      for (const appointment of del_bookapp) {
+        if (appointment.P_name === username) {
+          d_name_value.push(appointment.D_name);
+        }
+      }
+    }
 
 
 
@@ -179,29 +182,32 @@ router.post('/login', async (req, res) => {
   });
   
 
-  async  function function_change_doctor_status(D_name)
+  async  function function_change_doctor_status(d_name_value)
   {
 
+    for (let i = 0; i < d_name_value.length; i++) {
+      console.log(d_name_value[i]);
 
-    console.log(D_name);
+      try {
 
-    try {
-   
-           // Update user settings in the collection
-           const result = await Appointment.updateOne(
-               { loggedInUser: D_name},
-               {
-                   $set: {
-                    isApproved:false,
-                   },
-               }
-           );
-             //  console.log(result);
-   
-         
-       } catch (error) {
-           console.error(error);
-       }
+     
+          // Update user settings in the collection
+          const result = await Appointment.updateOne(
+              { loggedInUser: d_name_value[i]},
+              {
+                  $set: {
+                   isApproved:false,
+                  },
+              }
+          );
+            //  console.log(result);
+  
+        
+      } catch (error) {
+          console.error(error);
+      }
+
+    }
 
 
   }
@@ -905,36 +911,7 @@ router.delete('/delete_apmt_doctor', async (req, res) => {
 });
 
 
-// Define the POST method for the /chatbot endpoint
-// router.post('/chatbot', async (req, res) => {
-//   try {
-//       const API_KEY = "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";
-//       const response = await fetch("https://api.openai.com/v1/chat/completions", {
-//           method: "POST",
-//           headers: {
-//               Authorization: `Bearer ${API_KEY}`,
-//               "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({
-//               model: "gpt-3.5-turbo",
-//               messages: [
-//                   {
-//                       role: "user",
-//                       content: req.body.message, // Assuming the message is sent in the request body
-//                   },
-//               ],
-//               temperature: 1,
-//               max_tokens: 100,
-//           }),
-//       });
-//       const data = await response.json();
-//       const botResponse = data["choices"][0]["message"]["content"];
-//       res.json({ response: botResponse });
-//   } catch (error) {
-//       console.error("Error fetching response from OpenAI:", error);
-//       res.status(500).json({ error: "Internal Server Error" });
-//   }
-// });
+
   
 const axios = require('axios');
 
@@ -953,70 +930,8 @@ async function makeRequestWithRetry(url, data, config, retries = 3, delay = 1000
     }
 }
 
-// router.post('/chatbot', async (req, res) => {
-//     const API_KEY = "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";
-//     const url = "https://api.openai.com/v1/chat/completions";
-//     const config = {
-//         headers: {
-//             Authorization: `Bearer ${API_KEY}`,
-//             "Content-Type": "application/json",
-//         }
-//     };
-//     const requestData = {
-//         model: "gpt-3.5-turbo",
-//         messages: [
-//             {
-//                 role: "user",
-//                 content: req.body.message,
-//             },
-//         ],
-//         temperature: 1,
-//         max_tokens: 100,
-//     };
-
-//     try {
-//         const responseData = await makeRequestWithRetry(url, requestData, config);
-//         const botResponse = responseData["choices"][0]["message"]["content"];
-//         res.json({ response: botResponse });
-//     } catch (error) {
-//         console.error("Error fetching response from OpenAI:", error);
-//         res.status(500).json({ error: "Internal Server Error" });
-//     }
-// });
 
 
-
-
-router.post('/https://api.openai.com/v1/chat/completions', async (req, res) => {
-  const API_KEY = "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";
-  const url = "https://api.openai.com/v1/chat/completions";
-  const config = {
-      headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Content-Type": "application/json",
-      }
-  };
-  const requestData = {
-      model: "gpt-3.5-turbo",
-      messages: [
-          {
-              role: "user",
-              content: req.body.message,
-          },
-      ],
-      temperature: 1,
-      max_tokens: 100,
-  };
-
-  try {
-      const responseData = await makeRequestWithRetry(url, requestData, config);
-      const botResponse = responseData["choices"][0]["message"]["content"];
-      res.json({ response: botResponse });
-  } catch (error) {
-      console.error("Error fetching response from OpenAI:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-  }
-});
 
 
 
