@@ -3,15 +3,15 @@ const cors = require('cors');
 const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const pdf = require('html-pdf');
-const pdfkit = require('pdfkit');
-const { PassThrough } = require('stream');
-const fs = require('fs');
-const http = require('http');
+// const pdf = require('html-pdf');
+// const pdfkit = require('pdfkit');
+// const { PassThrough } = require('stream');
+// const fs = require('fs');
+// const http = require('http');
 //const socketIo = require('socket.io');
-const fetch = require('node-fetch');
-const path = require('path');
-
+// const fetch = require('node-fetch');
+// const path = require('path');
+// const Razorpay = require('razorpay');
 
 
 
@@ -21,6 +21,9 @@ app.use(bodyParser.json({ limit: '100mb' }));
 //const { MongoClient } = require('mongodb');
 const port = 3000;
 app.use(cors());
+
+
+
 
 //const uri = "mongodb+srv://lakshin2563:nirma123@cluster0.qtmkizi.mongodb.net/?retryWrites=true&w=majority";
 //const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -118,7 +121,7 @@ app.post('/login', async (req, res) => {
 
 app.post('/addEvent', async (req, res) => {
     const { appointmentDate, appointmentDay, availableTime, loggedInUser } = req.body;
-
+    
     try {
         // Check if an event with the same name already exists for the loggedInUser
         const existingEvent = await Appointment.findOne({ availableTime: availableTime, loggedInUser: loggedInUser });
@@ -639,9 +642,29 @@ app.post('/updateevent', async (req, res) => {
                 },
             }
         );
+      
+        console.log(Appointment_id+ availableTime+Appointment_Date+Appointment_Day);
+
+        const result2 = await BookedAppointment.updateOne(
+            { Appointment_id: Appointment_id },
+            {
+                
+                $set: {
+                    Appointment_Date: Appointment_Date,
+                    availableTime: availableTime,
+                    Appointment_Day: Appointment_Day,
+                },
+            }
+        );
+
+        console.log("pathak1");
+        console.log(result2);
+        console.log(result2.modifiedCount);
+        console.log("pathak2");
+
           //  console.log(result);
 
-        if (result.modifiedCount > 0) {
+        if (result.modifiedCount > 0 ||  result2.modifiedCount > 0) {
             // Event updated successfully
             res.json({ success: true, message: 'Appointment updated successfully!' });
         } else {

@@ -629,7 +629,23 @@ router.post('/updateevent', async (req, res) => {
       }
     );
 
-    if (result.modifiedCount > 0) {
+
+ // Update appointment details in the collection
+ 
+ const result2 = await db.collection('bookedapps').updateOne(
+  { Appointment_id: Appointment_id },
+  {
+    $set: {
+      Appointment_Date: Appointment_Date,
+      availableTime: availableTime,
+      Appointment_Day: Appointment_Day,
+    },
+  }
+);
+
+
+
+    if (result.modifiedCount > 0 ||  result2.modifiedCount>0) {
       // Appointment updated successfully
       res.json({ success: true, message: 'Appointment updated successfully!' });
     } else {
